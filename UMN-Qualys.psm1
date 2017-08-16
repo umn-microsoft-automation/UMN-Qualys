@@ -487,17 +487,17 @@ function New-QualysIP{
         }
         ########################### now we have a full list of IPs to check against
         ###  check if IP to be added is is in the list
-        if ($ips -notcontains $ip_add)
+        if ($ips -notcontains $ip)
         {
             $actionBody = @{
                 action = "edit"
                 id = $groupID
-                add_ips = $ip_add
+                add_ips = $ip
             }
             [xml]$response = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
             ## check that it worked
             $qualysError = $response.SIMPLE_RETURN.RESPONSE.TEXT
-            if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq $successResponse)){throw "Failed to add IP $ip_add -- $qualysError"}
+            if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq $successResponse)){throw "Failed to add IP $ip -- $qualysError"}
             else{return $true}
             
         }
