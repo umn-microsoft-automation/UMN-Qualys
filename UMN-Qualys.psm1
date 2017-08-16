@@ -12,7 +12,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>. 
 
 # Based off 
 # https://community.qualys.com/community/developer
@@ -487,17 +487,17 @@ function New-QualysIP{
         }
         ########################### now we have a full list of IPs to check against
         ###  check if IP to be added is is in the list
-        if ($ips -notcontains $ip_add)
+        if ($ips -notcontains $ip)
         {
             $actionBody = @{
                 action = "edit"
                 id = $groupID
-                add_ips = $ip_add
+                add_ips = $ip
             }
             [xml]$response = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
             ## check that it worked
             $qualysError = $response.SIMPLE_RETURN.RESPONSE.TEXT
-            if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq $successResponse)){throw "Failed to add IP $ip_add -- $qualysError"}
+            if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq $successResponse)){throw "Failed to add IP $ip -- $qualysError"}
             else{return $true}
             
         }
