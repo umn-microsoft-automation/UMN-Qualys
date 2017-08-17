@@ -122,21 +122,16 @@ function Disconnect-Qualys{
     )
 
     Begin{}
-
     Process
     {
         ## Login/out
-        $logInBody = @{
-            action = "logout"
-            username = $qualysuser
-            password = $qualysPswd
-        }
-
+        $logInBody = @{action = "logout"}
         ## Log in SessionVariable captures the cookie
         $uri += 'session/'
-        Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $logInBody -WebSession $cookie
+        $return = (Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $logInBody -WebSession $cookie).SIMPLE_RETURN.RESPONSE.TEXT
+        if ($return -eq 'Logged out'){return $true}
+        else{Write-Warning "Qualys logout issue" + $return}
     }
-
     End{}
 }
 #endregion
@@ -502,7 +497,7 @@ function Get-QualysScanResults{
         $actionBody = @{action = "fetch";scan_ref = $scanRef;output_format='json'}
         if($additionalOptions){$actionBody += $additionalOptions}
         if($brief){$actionBody += @{mode='brief'}}
-        Invoke-RestMethod -Headers $header -Uri $uri -Method Get -Body $actionBody -WebSession $cookie | ConvertFrom-Json
+        Invoke-RestMethod -Headers $header -Uri $uri -Method Get -Body $actionBody -WebSession $cookie #| ConvertFrom-Json
         
     }
     End{}
