@@ -84,8 +84,8 @@ function Connect-Qualys{
 }
 #endregion
 
-#region disconnect-Qualys
-function disconnect-Qualys{
+#region Disconnect-Qualys
+function Disconnect-Qualys{
 <#
     .Synopsis
        Connect to Qualys API and get back session $cookie for all other functions
@@ -674,15 +674,12 @@ function Remove-QualysIP{
             id = $groupID
             remove_ips = $ip
         }        
-            ## Run your action, WebSession contains the cookie from login
+        $successResponse = "Asset Group Updated Successfully"
         [xml]$returnedXML = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
-        if ($returnedXML.SIMPLE_RETURN.RESPONSE.TEXT -ne $successResponse){throw "$logInit Error - $ip - $returnedXML.SIMPLE_RETURN.RESPONSE.TEXT"}
+        if ($returnedXML.SIMPLE_RETURN.RESPONSE.TEXT -ne $successResponse){throw "Error - $ip - " + $returnedXML.SIMPLE_RETURN.RESPONSE.TEXT}
         else{return $true}
     }
-    End
-    {
-        $returnedXML = $null
-    }
+    End{}
 }
 #endregion
 
