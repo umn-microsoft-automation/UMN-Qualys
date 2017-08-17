@@ -286,7 +286,9 @@ function Get-QualysReport{
         $actionBody = @{action = "fetch";id = "$id"}  
         $null = Invoke-RestMethod -Headers $header -Uri $uri -Method get -Body $actionBody -WebSession $cookie -OutFile $outfile
     }
-    End{}
+    End{
+        return $outfile
+        }
 }
 #endregion
 
