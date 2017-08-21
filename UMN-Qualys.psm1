@@ -680,4 +680,105 @@ function Remove-QualysIP{
 }
 #endregion
 
+#region New-QualysIP
+function New-QualysIP{
+<#
+    .Synopsis
+        
 
+    .DESCRIPTION
+        
+    .PARAMTER uri
+        This will take the form https://<fqdn>:443/api/<apiversion>/fo see Qualys documentation for specifics
+
+    .PARAMTER header
+        Use Get-QualysHeader to get this
+
+    .PARAMTER cookie
+        Use Connect-Qualys to get session cookie
+
+    .EXAMPLE
+        
+
+    .EXAMPLE
+        
+#>
+    [CmdletBinding()]
+    Param
+    (
+        [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
+        [string]$ip,
+
+        [Parameter(Mandatory=$true)]
+        [string]$groupID,
+
+        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo")]
+        [string]$uri,
+
+        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [System.Collections.Hashtable]$header,
+
+        [Parameter(Mandatory=$true)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{
+    $successResponse = 'Asset Group Updated Successfully'
+        }
+    Process
+    {
+        ## Create URL, see API docs for path
+        #########################
+        $uri += 'asset/group/'
+        #########################
+        $actionBody = @{
+            action = "list"
+            ids = $groupID
+        }        
+        
+        ## Run your action, WebSession contains the cookie from login
+        [xml]$returnedXML = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
+
+        # Single IPs
+        [System.Collections.ArrayList]$ips = $returnedXML.ASSET_GROUP_LIST_OUTPUT.RESPONSE.ASSET_GROUP_LIST.ASSET_GROUP.IP_SET.IP
+        # IP Ranges, these will take more work to extrapolate 
+        [System.Collections.ArrayList]$ipRanges = $returnedXML.ASSET_GROUP_LIST_OUTPUT.RESPONSE.ASSET_GROUP_LIST.ASSET_GROUP.IP_SET.IP_RANGE
+
+        ## break up the ip range strings, extract all the ips .. blah blah
+        foreach ($range in $ipRanges)
+        {
+            $a,$b = $range -split "-"
+            $a1,$a2,$a3,[int]$a4 = $a -split "\."
+            $b1,$b2,$b3,[int]$b4 = $b -split "\."
+            foreach ($i in $a4 .. $b4)
+            {
+                $newIP = $a1 + "." + $a2 + "." + $a3 + "." + [string]$i
+                # add to the array of IPs, check for doubles
+                if ($ips -notcontains $newIP){$junk = $ips.Add($newIP)}
+            }
+    
+        }
+        ########################### now we have a full list of IPs to check against
+        ###  check if IP to be added is is in the list
+        if ($ips -notcontains $ip)
+        {
+            $actionBody = @{
+                action = "edit"
+                id = $groupID
+                add_ips = $ip
+            }
+            [xml]$response = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
+            ## check that it worked
+            $qualysResponse = $response.SIMPLE_RETURN.RESPONSE.TEXT
+            if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq $successResponse)){throw "Failed to add IP $ip -- $qualysError"}
+            else{return $true}
+            
+        }
+        else{return $true}  
+    }
+    End
+    {
+        $returnedXML = $null
+    }
+}
+#endregion
