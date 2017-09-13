@@ -1,4 +1,5 @@
-﻿###
+﻿#region Intro
+###
 # Copyright 2017 University of Minnesota, Office of Information Technology
 
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +21,8 @@
 # https://www.qualys.com/docs/qualys-api-v2-user-guide.pdf
 # https://www.qualys.com/docs/qualys-asset-management-tagging-api-v2-user-guide.pdf
 
+#endregion
+
 #region Connect-Qualys
 function Connect-Qualys{
 <#
@@ -27,59 +30,72 @@ function Connect-Qualys{
        Connect to Qualys API and get back session $cookie for all other functions
 
     .DESCRIPTION
-        Connect to Qualys API and get back session $cookie for all other functions
-
-    .PARAMETER uri
-        This will take the form https://<fqdn>:443/api/<apiversion>/fo
-
-    .PARAMETER header
-        Use Get-QualysHeader to get the correctly formatted header for Qualys
+        Connect to Qualys API and get back session $cookie for all other functions.
 
     .PARAMETER qualysCred
         use Get-Credential to create a PSCredential with the username and password of an account that has access to Qualys
+
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
     
+    .PARAMTER assetTagging
+        There are two different api endpoints, the new one is Asset Management and Tagging.  Use this switch to get a cookie to make calls to Asset Management and Tagging
+
     .EXAMPLE
-        $cookie = Connect-Qualys -uri 'https://qualysapi.qualys.com:443/api/2.0/fo/session/' -header (Get-QualysHeader) -qualysCred (Get-Credential)
-        
+        $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer
+     
+    .EXAMPLE
+        $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer -assetTagging
+           
     .Notes
         Author: Travis Sobeck, Kyle Weeks
 #>
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
-        [string]$uri,
-
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
-        [System.Collections.Hashtable]$header,
+        [Parameter(Mandatory=$true)]
+        [System.Management.Automation.PSCredential]$qualysCred,
 
         [Parameter(Mandatory=$true)]
-        [System.Management.Automation.PSCredential]$qualysCred
+        [string]$qualysServer,
+
+        [switch]$assetTagging
+        
     )
 
     Begin{}
-
     Process
     {
         $qualysuser = $qualysCred.UserName
         $qualysPswd = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($qualysCred.Password))
    
-        ############# Log in ############# 
-        ## URL for Logging In/OUT
-        
-        ## Login/out
-        $logInBody = @{
-            action = "login"
-            username = $qualysuser
-            password = $qualysPswd
+        if ($assetTagging)
+        {
+            $auth = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($qualysuser+':'+$qualysPswd))	
+            $header += @{"Authorization" = "Basic $auth"}	    
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/portal/version" -Method GET -SessionVariable cookie -Headers $header
+            return $cookie
+
         }
+        else
+        {
+            ############# Log in ############# 
+            ## URL for Logging In/OUT
+        
+            ## Login/out
+            $logInBody = @{
+                action = "login"
+                username = $qualysuser
+                password = $qualysPswd
+            }
 
-        ## Log in SessionVariable captures the cookie
-        $uri += 'session/'
-        $response = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $logInBody -SessionVariable cookie
-        return $cookie
+            ## Log in SessionVariable captures the cookie
+            $uri = "https://$qualysServer/api/2.0/fo/session/"
+            $response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"} -Uri $uri -Method Post -Body $logInBody -SessionVariable cookie
+            return $cookie
+        }
+        
     }
-
     End{}
 }
 #endregion
@@ -227,6 +243,90 @@ function Get-QualysHeader{
 }
 #endregion
 
+#region Get-QualysHostAsset
+function Get-QualysHostAsset{
+<#
+    .Synopsis
+        Get Host Asset
+
+    .DESCRIPTION
+        Get Host Asset
+         
+    .PARAMTER hostID
+        ID of a host
+
+    .PARAMTER searchTerm
+        part of the name of Host Asset that will be used in a "Contains" search
+
+    .PARAMTER IP
+        Get Host Asset by IP address
+    
+    .PARAMTER filter
+        The search section can take a lot of params, see the Qualys Documentation for details.  us the filter paramter to create your own custom search
+    
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+    .PARAMETER cookie
+        Use Connect-Qualys to get session cookie
+
+    .EXAMPLE
+        
+
+    .EXAMPLE
+        
+#>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory=$true,ParameterSetName='ID')]
+        [string]$hostID,
+
+        [Parameter(Mandatory=$true,ParameterSetName='Search')]
+        [string]$searchTerm,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ip')]
+        [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
+        [string]$ip,
+
+        [Parameter(Mandatory=$true,ParameterSetName='filter')]
+        [System.Collections.Hashtable]$filter,
+
+        [Parameter(Mandatory=$true)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory=$true)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {
+        if ($hostID)
+        {
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/get/am/hostasset/$hostID" -Method GET -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie
+        }
+        elseif ($filter)
+        {
+            $body = $filter | ConvertTo-Json -Depth 5
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/search/am/hostasset" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        }
+        elseif ($ip)
+        {
+            $body = @{ServiceRequest = @{filters = @{Criteria = @(@{"field" = "address";"operator" = "EQUALS";"value" = $ip})}}} | ConvertTo-Json -Depth 5
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/search/am/hostasset" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        }
+        else
+        {
+            $body = @{ServiceRequest = @{filters = @{Criteria = @(@{"field" = "name";"operator" = "CONTAINS";"value" = $searchTerm})}}} | ConvertTo-Json -Depth 5
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/search/am/hostasset" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        }
+        return $response.ServiceResponse.data.HostAsset
+    }
+    End{}
+}
+#endregion
+
 #region Get-QualysReport
 function Get-QualysReport{
 <#
@@ -323,7 +423,7 @@ function Get-QualysReportList{
     (
         [string]$id,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/")]
         [string]$uri,
 
         [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
@@ -564,6 +664,120 @@ function Get-QualysSchedReportList{
 }
 #endregion
 
+#region Get-QualysTagCount
+function Get-QualysTagCount{
+<#
+    .Synopsis
+        Get-QualysTagCount
+
+    .DESCRIPTION
+        Get-QualysTagCount
+         
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+    .PARAMETER cookie
+        Use Connect-Qualys to get session cookie
+
+    .EXAMPLE
+        
+
+    .EXAMPLE
+        
+#>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory=$true)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {
+        $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/count/am/tag" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie
+        if ($response.ServiceResponse.count){return $response.ServiceResponse.count}
+        else{throw "Error $($response.ServiceResponse)"}
+    }
+    End{}
+}
+#endregion
+
+#region Get-QualysTag
+function Get-QualysTag{
+<#
+    .Synopsis
+        Get Qualys Tag(s)
+
+    .DESCRIPTION
+        Get Qualys Tag(s)
+         
+    .PARAMTER tagID
+        ID of a tag
+
+    .PARAMTER searchTerm
+        part of the name of tag that will be used in a "Contains" search
+
+    .PARAMTER filter
+        The search section can take a lot of params, see the Qualys Documentation for details.  us the filter paramter to create your own custom search
+    
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+    .PARAMETER cookie
+        Use Connect-Qualys to get session cookie
+
+    .EXAMPLE
+        
+
+    .EXAMPLE
+        
+#>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory=$true,ParameterSetName='ID')]
+        [string]$tagID,
+
+        [Parameter(Mandatory=$true,ParameterSetName='Search')]
+        [string]$searchTerm,
+
+        [Parameter(Mandatory=$true,ParameterSetName='filter')]
+        [System.Collections.Hashtable]$filter,
+
+        [Parameter(Mandatory=$true)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory=$true)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {
+        if ($tagID)
+        {
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/get/am/tag/$tagID" -Method GET -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie
+        }
+        elseif ($filter)
+        {
+            $body = $filter | ConvertTo-Json -Depth 5
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/search/am/tag" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        }
+        else
+        {
+            $body = @{ServiceRequest = @{filters = @{Criteria = @(@{"field" = "name";"operator" = "CONTAINS";"value" = $searchTerm})}}} | ConvertTo-Json -Depth 5
+            $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/search/am/tag" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        }
+        return $response.ServiceResponse.data.Tag 
+    }
+    End{}
+}
+#endregion
+
 #region Invoke-QualysBase
 function Invoke-QualysBase{
 <#
@@ -615,19 +829,166 @@ function Invoke-QualysBase{
 }
 #endregion
 
-#region Remove-QualysIP
-function Remove-QualysIP{
+#region New-QualysIP
+function New-QualysIP{
 <#
     .Synopsis
         
 
     .DESCRIPTION
         
-    .PARAMETER uri
-        This will take the form https://<fqdn>:443/api/<apiversion>/fo see Qualys documentation for specifics
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
 
-    .PARAMETER header
-        Use Get-QualysHeader to get this
+    .PARAMTER cookie
+        Use Connect-Qualys to get session cookie
+
+    .EXAMPLE
+        
+
+    .EXAMPLE
+        
+#>
+    [CmdletBinding()]
+    Param
+    (
+        [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
+        [string]$ip,
+
+        [Parameter(Mandatory=$true)]
+        [string]$groupID,
+
+        [Parameter(Mandatory=$true)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory=$true)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{
+        $successResponse = 'Asset Group Updated Successfully'
+    }
+    Process
+    {
+        ## Create URL, see API docs for path
+        $header = @{"X-Requested-With"="powershell"}
+        #########################
+        $uri = "https://$qualysServer/api/2.0/fo/asset/group/"
+        #########################
+        $actionBody = @{
+            action = "list"
+            ids = $groupID
+        }        
+        
+        ## Run your action, WebSession contains the cookie from login
+        [xml]$returnedXML = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
+
+        # Single IPs
+        [System.Collections.ArrayList]$ips = $returnedXML.ASSET_GROUP_LIST_OUTPUT.RESPONSE.ASSET_GROUP_LIST.ASSET_GROUP.IP_SET.IP
+        # IP Ranges, these will take more work to extrapolate 
+        [System.Collections.ArrayList]$ipRanges = $returnedXML.ASSET_GROUP_LIST_OUTPUT.RESPONSE.ASSET_GROUP_LIST.ASSET_GROUP.IP_SET.IP_RANGE
+
+        ## break up the ip range strings, extract all the ips .. blah blah
+        foreach ($range in $ipRanges)
+        {
+            $a,$b = $range -split "-"
+            $a1,$a2,$a3,[int]$a4 = $a -split "\."
+            $b1,$b2,$b3,[int]$b4 = $b -split "\."
+            foreach ($i in $a4 .. $b4)
+            {
+                $newIP = $a1 + "." + $a2 + "." + $a3 + "." + [string]$i
+                # add to the array of IPs, check for doubles
+                if ($ips -notcontains $newIP){$junk = $ips.Add($newIP)}
+            }
+    
+        }
+        ########################### now we have a full list of IPs to check against
+        ###  check if IP to be added is is in the list
+        if ($ips -notcontains $ip)
+        {
+            $actionBody = @{
+                action = "edit"
+                id = $groupID
+                add_ips = $ip
+            }
+            [xml]$response = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
+            ## check that it worked
+            $qualysResponse = $response.SIMPLE_RETURN.RESPONSE.TEXT
+            if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq $successResponse)){throw "Failed to add IP $ip -- $qualysError"}
+            else{return $true}
+            
+        }
+        else{return $true}  
+    }
+    End
+    {
+        $returnedXML = $null
+    }
+}
+#endregion
+
+#region New-QualysTag
+function New-QualysTag{
+<#
+    .Synopsis
+        Create New Qualys Tag
+
+    .DESCRIPTION
+        Create New Qualys Tag
+         
+    .PARAMTER tagName
+        Name of a tag to create
+    
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+    .PARAMETER cookie
+        Use Connect-Qualys to get session cookie
+
+    .EXAMPLE
+        
+
+    .EXAMPLE
+        
+#>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory=$true,ParameterSetName='ID')]
+        [string]$tagName,
+
+        [Parameter(Mandatory=$true)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory=$true)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {
+        ## Validate tage does not already exist
+
+        $body = @{ServiceRequest = @{data = @{Tag = @{name = $tagName}}}} | ConvertTo-Json -Depth 5
+        $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/create/am/tag" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        if ($response.ServiceResponse.responseCode -eq "SUCCESS"){return $true}
+        else{throw ($response | Select *)}
+    }
+    End{}
+}
+#endregion
+
+#region Remove-QualysIP
+function Remove-QualysIP{
+<#
+    .Synopsis
+        Remove IP from a group by groupId
+
+    .DESCRIPTION
+        Remove IP from a group by groupId
+         
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
 
     .PARAMETER cookie
         Use Connect-Qualys to get session cookie
@@ -647,11 +1008,8 @@ function Remove-QualysIP{
         [Parameter(Mandatory=$true)]
         [string]$groupID,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
-        [string]$uri,
-
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
-        [System.Collections.Hashtable]$header,
+        [Parameter(Mandatory=$true)]
+        [string]$qualysServer,
 
         [Parameter(Mandatory=$true)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
@@ -660,7 +1018,7 @@ function Remove-QualysIP{
     Begin{}
     Process
     {
-        $uri += 'asset/group/'
+        $uri = "https://$qualysServer/api/2.0/fo/asset/group/"
         ## Remove IP from Asset Group
         ## Look at passinging in Asset Group (High or regular) and set IP
         #########################
@@ -670,9 +1028,63 @@ function Remove-QualysIP{
             remove_ips = $ip
         }        
         $successResponse = "Asset Group Updated Successfully"
-        [xml]$returnedXML = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
+        [xml]$returnedXML = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"} -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
         if ($returnedXML.SIMPLE_RETURN.RESPONSE.TEXT -ne $successResponse){throw "Error - $ip - " + $returnedXML.SIMPLE_RETURN.RESPONSE.TEXT}
         else{return $true}
+    }
+    End{}
+}
+#endregion
+
+#region Set-QualysHostAssetTag
+function Set-QualysHostAssetTag{
+<#
+    .Synopsis
+        Set tag on a Host Asset
+
+    .DESCRIPTION
+        Set tag on a Host Asset
+         
+    .PARAMTER hostID
+        ID of a host
+
+    .PARAMTER tagID
+        ID of tag to apply to Host Asset
+            
+    .PARAMTER qualysServer
+        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+    .PARAMETER cookie
+        Use Connect-Qualys to get session cookie
+
+    .EXAMPLE
+        
+
+    .EXAMPLE
+        
+#>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory)]
+        [string]$hostID,
+
+        [Parameter(Mandatory)]
+        [string]$tagID,
+
+        [Parameter(Mandatory)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {        
+        $body = @{ServiceRequest = @{data = @{HostAsset = @{tags = @{add = @(@{TagSimple = @{id = $tagID}})}}}}} | ConvertTo-Json -Depth 7
+        $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/update/am/hostasset/$hostID" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body        
+        return $response
     }
     End{}
 }
