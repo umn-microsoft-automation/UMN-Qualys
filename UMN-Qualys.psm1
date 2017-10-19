@@ -53,10 +53,10 @@ function Connect-Qualys{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [System.Management.Automation.PSCredential]$qualysCred,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$qualysServer,
 
         [switch]$assetTagging
@@ -127,13 +127,13 @@ function Disconnect-Qualys{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
         [string]$uri,
 
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -185,13 +185,13 @@ function Get-QualysAssetGrp{
     (
         [string]$id,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
         [string]$uri,
 
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -279,23 +279,23 @@ function Get-QualysHostAsset{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true,ParameterSetName='ID')]
+        [Parameter(Mandatory,ParameterSetName='ID')]
         [string]$hostID,
 
-        [Parameter(Mandatory=$true,ParameterSetName='Search')]
+        [Parameter(Mandatory,ParameterSetName='Search')]
         [string]$searchTerm,
 
-        [Parameter(Mandatory=$true,ParameterSetName='ip')]
+        [Parameter(Mandatory,ParameterSetName='ip')]
         [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
         [string]$ip,
 
-        [Parameter(Mandatory=$true,ParameterSetName='filter')]
+        [Parameter(Mandatory,ParameterSetName='filter')]
         [System.Collections.Hashtable]$filter,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$qualysServer,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -358,19 +358,19 @@ function Get-QualysReport{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$id,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$outFilePath,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
         [string]$uri,
         
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -423,13 +423,13 @@ function Get-QualysReportList{
     (
         [string]$id,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/")]
         [string]$uri,
 
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -493,13 +493,13 @@ function Get-QualysScanList{
 
         [switch]$brief,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
         [string]$uri,
 
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -578,13 +578,13 @@ function Get-QualysScanResults{
 
         [switch]$brief,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
         [string]$uri,
 
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -637,13 +637,13 @@ function Get-QualysSchedReportList{
     (
         [string]$id,
         
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
         [string]$uri,
 
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -688,10 +688,10 @@ function Get-QualysTagCount{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$qualysServer,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -715,16 +715,19 @@ function Get-QualysTag{
     .DESCRIPTION
         Get Qualys Tag(s)
          
-    .PARAMTER tagID
+    .PARAMETER tagID
         ID of a tag
 
     .PARAMTER searchTerm
         part of the name of tag that will be used in a "Contains" search
 
-    .PARAMTER filter
+    .PARAMETER operator
+        operator to apply to searchTerm, options are 'CONTAINS','EQUALS','NOT EQUALS'.  NOTE 'EQUALS' IS case sensative!
+
+    .PARAMETER filter
         The search section can take a lot of params, see the Qualys Documentation for details.  us the filter paramter to create your own custom search
     
-    .PARAMTER qualysServer
+    .PARAMETER qualysServer
         FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
 
     .PARAMETER cookie
@@ -739,19 +742,23 @@ function Get-QualysTag{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true,ParameterSetName='ID')]
+        [Parameter(Mandatory,ParameterSetName='ID')]
         [string]$tagID,
 
-        [Parameter(Mandatory=$true,ParameterSetName='Search')]
+        [Parameter(Mandatory,ParameterSetName='Search')]
         [string]$searchTerm,
 
-        [Parameter(Mandatory=$true,ParameterSetName='filter')]
+        [Parameter(ParameterSetName='Search')]
+        [ValidateSet('CONTAINS','EQUALS','NOT EQUALS')]
+        [string]$operator = 'CONTAINS',
+
+        [Parameter(Mandatory,ParameterSetName='filter')]
         [System.Collections.Hashtable]$filter,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$qualysServer,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -769,7 +776,7 @@ function Get-QualysTag{
         }
         else
         {
-            $body = @{ServiceRequest = @{filters = @{Criteria = @(@{"field" = "name";"operator" = "CONTAINS";"value" = $searchTerm})}}} | ConvertTo-Json -Depth 5
+            $body = @{ServiceRequest = @{filters = @{Criteria = @(@{"field" = "name";"operator" = $operator;"value" = $searchTerm})}}} | ConvertTo-Json -Depth 5
             $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/search/am/tag" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
         }
         return $response.ServiceResponse.data.Tag 
@@ -804,19 +811,19 @@ function Invoke-QualysBase{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [System.Collections.Hashtable]$body,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$method,
 
-        [Parameter(Mandatory=$true,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
+        [Parameter(Mandatory,HelpMessage="This will take the form https://<fqdn>:443/api/<apiversion>/fo/session")]
         [string]$uri,
 
-        [Parameter(Mandatory=$true,HelpMessage="Use Get-QualysHeader")]
+        [Parameter(Mandatory,HelpMessage="Use Get-QualysHeader")]
         [System.Collections.Hashtable]$header,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -855,13 +862,13 @@ function New-QualysIP{
         [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
         [string]$ip,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$groupID,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$qualysServer,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -954,13 +961,13 @@ function New-QualysTag{
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory=$true,ParameterSetName='ID')]
+        [Parameter(Mandatory,ParameterSetName='ID')]
         [string]$tagName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$qualysServer,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -1005,13 +1012,13 @@ function Remove-QualysIP{
         [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
         [string]$ip,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$groupID,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$qualysServer,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
     )
 
@@ -1083,8 +1090,11 @@ function Set-QualysHostAssetTag{
     Process
     {        
         $body = @{ServiceRequest = @{data = @{HostAsset = @{tags = @{add = @(@{TagSimple = @{id = $tagID}})}}}}} | ConvertTo-Json -Depth 7
+        $body = @{ServiceRequest = @{data = @{HostAsset = @{tags = @{add = @{TagSimple = @{id = $tagID}}}}}}} | ConvertTo-Json -Depth 7
         $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/update/am/hostasset/$hostID" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body        
-        return $response
+        ## the quayls api response is junk, to a get to test it actually got added
+        if ($response.ServiceResponse.responseCode -eq 'SUCCESS'){return $true}
+        else{Write-Warning $response.ServiceResponse.responseErrorDetails;return $false}
     }
     End{}
 }
