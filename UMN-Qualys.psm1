@@ -25,31 +25,31 @@
 
 #region Connect-Qualys
 function Connect-Qualys{
-<#
-    .Synopsis
-       Connect to Qualys API and get back session $cookie for all other functions
+    <#
+        .Synopsis
+        Connect to Qualys API and get back session $cookie for all other functions
 
-    .DESCRIPTION
-        Connect to Qualys API and get back session $cookie for all other functions.
+        .DESCRIPTION
+            Connect to Qualys API and get back session $cookie for all other functions.
 
-    .PARAMETER qualysCred
-        use Get-Credential to create a PSCredential with the username and password of an account that has access to Qualys
+        .PARAMETER qualysCred
+            use Get-Credential to create a PSCredential with the username and password of an account that has access to Qualys
 
-    .PARAMTER qualysServer
-        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
-    
-    .PARAMTER assetTagging
-        There are two different api endpoints, the new one is Asset Management and Tagging.  Use this switch to get a cookie to make calls to Asset Management and Tagging
+        .PARAMTER qualysServer
+            FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+        
+        .PARAMTER assetTagging
+            There are two different api endpoints, the new one is Asset Management and Tagging.  Use this switch to get a cookie to make calls to Asset Management and Tagging
 
-    .EXAMPLE
-        $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer
-     
-    .EXAMPLE
-        $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer -assetTagging
-           
-    .Notes
-        Author: Travis Sobeck, Kyle Weeks
-#>
+        .EXAMPLE
+            $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer
+        
+        .EXAMPLE
+            $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer -assetTagging
+            
+        .Notes
+            Author: Travis Sobeck, Kyle Weeks
+    #>
     [CmdletBinding()]
     Param
     (
@@ -838,24 +838,24 @@ function Invoke-QualysBase{
 
 #region New-QualysIP
 function New-QualysIP{
-<#
-    .Synopsis
-        
+    <#
+        .Synopsis
+            
 
-    .DESCRIPTION
-        
-    .PARAMTER qualysServer
-        FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+        .DESCRIPTION
+            
+        .PARAMTER qualysServer
+            FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
 
-    .PARAMTER cookie
-        Use Connect-Qualys to get session cookie
+        .PARAMTER cookie
+            Use Connect-Qualys to get session cookie
 
-    .EXAMPLE
-        
+        .EXAMPLE
+            
 
-    .EXAMPLE
-        
-#>
+        .EXAMPLE
+            
+    #>
     [CmdletBinding()]
     Param
     (
