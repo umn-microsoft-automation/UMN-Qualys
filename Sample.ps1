@@ -6,9 +6,9 @@ $data = Get-QualysReportList -qualysServer $qualysServer -cookie $cookie
 $data
 $data | select ID,TITLE,TYPE
 
-get-QualysReport -uri $uri -header $header -cookie $cookie -id 11111 -outFilePath C:\Users\you
-Get-QualysAssetGrp -uri $uri -header $header -cookie $cookie
+get-QualysReport -qualysServer $qualysServer -cookie $cookie -id 11111 -outFilePath C:\Users\you
+Get-QualysAssetGrp -qualysServer $qualysServer -cookie $cookie
 
-Get-QualysAssetGrp -uri $uri -header $header -cookie $cookie -id '111111'
+Get-QualysAssetGrp -qualysServer $qualysServer -cookie $cookie -id '111111'
 
 
