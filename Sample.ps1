@@ -1,8 +1,8 @@
 ﻿$qualysServer = 'qualysapi.qualys.com'
 $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer -assetTagging
-$cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer
+$cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer 
 
-$data = Get-QualysReportList -uri $uri -header $header -cookie $cookie
+$data = Get-QualysReportList -qualysServer $qualysServer -cookie $cookie
 $data
 $data | select ID,TITLE,TYPE
 
