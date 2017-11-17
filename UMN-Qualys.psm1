@@ -786,11 +786,11 @@ function New-QualysIP{
                 id = $groupID
                 add_ips = $ip
             }
-            [xml]$response = Invoke-RestMethod -Headers $header -Uri $uri -Method Post -Body $actionBody -WebSession $cookie
+            [xml]$response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri "https://$qualysServer/api/2.0/fo/asset/group/" -Method Post -Body $actionBody -WebSession $cookie
             ## check that it worked
             if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq 'Asset Group Updated Successfully')){throw "Failed to add IP $ip -- $qualysError"}
             else{return $true}
-            
+             
         }
         else{return $true}  
     }
