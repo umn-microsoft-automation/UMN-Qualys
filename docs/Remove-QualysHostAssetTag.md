@@ -5,19 +5,20 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-QualysBase
+# Remove-QualysHostAssetTag
 
 ## SYNOPSIS
-Not currently useable
+Remove tag from a Host Asset
 
 ## SYNTAX
 
 ```
-Invoke-QualysBase [-body] <Hashtable> [-method] <String> [-qualysServer] <String> [-cookie] <WebRequestSession>
+Remove-QualysHostAssetTag [-hostID] <String> [-tagID] <String> [-qualysServer] <String>
+ [-cookie] <WebRequestSession>
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+Remove tag from a Host Asset
 
 ## EXAMPLES
 
@@ -30,11 +31,11 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -body
-{{Fill body Description}}
+### -hostID
+ID of a host
 
 ```yaml
-Type: Hashtable
+Type: String
 Parameter Sets: (All)
 Aliases: 
 
@@ -45,8 +46,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -method
-{{Fill method Description}}
+### -tagID
+ID of tag to apply to Host Asset
 
 ```yaml
 Type: String
