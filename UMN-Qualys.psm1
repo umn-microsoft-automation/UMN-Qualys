@@ -205,6 +205,9 @@ function Get-QualysHostAsset{
         .PARAMETER searchTerm
             part of the name of Host Asset that will be used in a "Contains" search
 
+        .PARAMETER operator
+            operator to apply to searchTerm, options are 'CONTAINS','EQUALS','NOT EQUALS'.  NOTE 'EQUALS' IS case sensative!
+            
         .PARAMETER IP
             Get Host Asset by IP address
         
@@ -231,6 +234,10 @@ function Get-QualysHostAsset{
 
         [Parameter(Mandatory,ParameterSetName='Search')]
         [string]$searchTerm,
+
+        [Parameter(ParameterSetName='Search')]
+        [ValidateSet('CONTAINS','EQUALS','NOT EQUALS')]
+        [string]$operator = 'CONTAINS',
 
         [Parameter(Mandatory,ParameterSetName='ip')]
         [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
@@ -265,7 +272,7 @@ function Get-QualysHostAsset{
         }
         else
         {
-            $body = @{ServiceRequest = @{filters = @{Criteria = @(@{"field" = "name";"operator" = "CONTAINS";"value" = $searchTerm})}}} | ConvertTo-Json -Depth 5
+            $body = @{ServiceRequest = @{filters = @{Criteria = @(@{"field" = "name";"operator" = $operator;"value" = $searchTerm})}}} | ConvertTo-Json -Depth 5
             $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/search/am/hostasset" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
         }
         return $response.ServiceResponse.data.HostAsset

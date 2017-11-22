@@ -14,22 +14,23 @@ Get Host Asset
 
 ### ID
 ```
-Get-QualysHostAsset -hostID <String> -qualysServer <String> -cookie <WebRequestSession>
+Get-QualysHostAsset -hostID <String> -qualysServer <String> -cookie <WebRequestSession> [<CommonParameters>]
 ```
 
 ### Search
 ```
-Get-QualysHostAsset -searchTerm <String> -qualysServer <String> -cookie <WebRequestSession>
+Get-QualysHostAsset -searchTerm <String> [-operator <String>] -qualysServer <String>
+ -cookie <WebRequestSession> [<CommonParameters>]
 ```
 
 ### ip
 ```
-Get-QualysHostAsset -ip <String> -qualysServer <String> -cookie <WebRequestSession>
+Get-QualysHostAsset -ip <String> -qualysServer <String> -cookie <WebRequestSession> [<CommonParameters>]
 ```
 
 ### filter
 ```
-Get-QualysHostAsset -filter <Hashtable> -qualysServer <String> -cookie <WebRequestSession>
+Get-QualysHostAsset -filter <Hashtable> -qualysServer <String> -cookie <WebRequestSession> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -75,6 +76,19 @@ Aliases:
 Required: True
 Position: Named
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -operator
+operator to apply to searchTerm, options are 'CONTAINS','EQUALS','NOT EQUALS'.  NOTE 'EQUALS' IS case sensative!```yaml
+Type: String
+Parameter Sets: Search
+Aliases: 
+
+Required: False
+Position: Named
+Default value: CONTAINS
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -139,6 +153,9 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+
+### CommonParameters
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
