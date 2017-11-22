@@ -207,7 +207,7 @@ function Get-QualysHostAsset{
 
         .PARAMETER operator
             operator to apply to searchTerm, options are 'CONTAINS','EQUALS','NOT EQUALS'.  NOTE 'EQUALS' IS case sensative!
-            
+
         .PARAMETER IP
             Get Host Asset by IP address
         
@@ -853,6 +853,57 @@ function New-QualysTag{
 }
 #endregion
 
+#region Remove-QualysHostAssetTag
+function Remove-QualysHostAssetTag{
+    <#
+        .Synopsis
+            Remove tag from a Host Asset
+
+        .DESCRIPTION
+            Remove tag from a Host Asset
+            
+        .PARAMETER hostID
+            ID of a host
+
+        .PARAMETER tagID
+            ID of tag to apply to Host Asset
+                
+        .PARAMETER qualysServer
+            FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+        .PARAMETER cookie
+            Use Connect-Qualys to get session cookie
+      
+    #>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory)]
+        [string]$hostID,
+
+        [Parameter(Mandatory)]
+        [string]$tagID,
+
+        [Parameter(Mandatory)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {
+        $body = @{ServiceRequest = @{data = @{HostAsset = @{tags = @{remove = @{TagSimple = @{id = $tagID}}}}}}} | ConvertTo-Json -Depth 7
+        $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/update/am/hostasset/$hostID" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body        
+        ## the quayls api response is junk, to a get to test it actually got added
+        if ($response.ServiceResponse.responseCode -eq 'SUCCESS'){return $true}
+        else{Write-Warning $response.ServiceResponse.responseErrorDetails;return $false}
+    }
+    End{}
+}
+#endregion
+
 #region Remove-QualysIP
 function Remove-QualysIP{
     <#
@@ -942,8 +993,7 @@ function Set-QualysHostAssetTag{
 
     Begin{}
     Process
-    {        
-        $body = @{ServiceRequest = @{data = @{HostAsset = @{tags = @{add = @(@{TagSimple = @{id = $tagID}})}}}}} | ConvertTo-Json -Depth 7
+    {
         $body = @{ServiceRequest = @{data = @{HostAsset = @{tags = @{add = @{TagSimple = @{id = $tagID}}}}}}} | ConvertTo-Json -Depth 7
         $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/update/am/hostasset/$hostID" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body        
         ## the quayls api response is junk, to a get to test it actually got added
