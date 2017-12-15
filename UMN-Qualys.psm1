@@ -684,6 +684,57 @@ function Get-QualysTag{
 }
 #endregion
 
+#region New-QualysHostAsset
+function New-QualysHostAsset{
+    <#
+        .Synopsis
+            Create New Qualys Asset
+
+        .DESCRIPTION
+            Create New Qualys Host Asset
+        .PARAMETER assetName
+            Host Asset's FQDN to be added           
+        .PARAMETER tagID
+            ID of tag to add at build time        
+        .PARAMETER qualysServer
+            FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+        .PARAMETER cookie
+            Use Connect-Qualys to get session cookie      
+    #>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory)]
+        [string]$assetName,
+
+        [Parameter(Mandatory)]
+        [string]$ip,
+
+        [string]$tagID,
+
+        [Parameter(Mandatory)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {
+        
+        $body = @{ServiceRequest = @{data = @{HostAsset = @{name = $assetName;address=$ip;trackingMethod='IP'}}}}
+        if($tagID){$body['ServiceRequest']['data']['HostAsset']['tags'] = @{set=@{TagSimple = @{id = $tagID}}}}
+        $body = $body | ConvertTo-Json -Depth 7
+        $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/create/am/hostasset" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        if ($response.ServiceResponse.responseCode -eq "SUCCESS"){return $response.ServiceResponse.data.HostAsset}
+        else{throw ($response.ServiceResponse)}
+    }
+    End{}
+}
+#endregion
+
 #region Invoke-QualysBase
 function Invoke-QualysBase{
     <#
@@ -846,6 +897,49 @@ function New-QualysTag{
 
         $body = @{ServiceRequest = @{data = @{Tag = @{name = $tagName}}}} | ConvertTo-Json -Depth 5
         $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/create/am/tag" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
+        if ($response.ServiceResponse.responseCode -eq "SUCCESS"){return $true}
+        else{throw ($response | Select-Object *)}
+    }
+    End{}
+}
+#endregion
+
+#region Remove-QualysHostAsset
+function Remove-QualysHostAsset{
+    <#
+        .Synopsis
+            Remove Qualys Host Asset
+
+        .DESCRIPTION
+            Remove New Qualys Host Asset
+            
+        .PARAMETER assetID
+            Host Asset's ID 
+        
+        .PARAMETER qualysServer
+            FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+        .PARAMETER cookie
+            Use Connect-Qualys to get session cookie      
+    #>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory)]
+        [string]$assetID,
+
+        [Parameter(Mandatory)]
+        [string]$qualysServer,
+
+        [Parameter(Mandatory)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie
+    )
+
+    Begin{}
+    Process
+    {
+        
+        $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/delete/am/hostasset/$assetID" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie
         if ($response.ServiceResponse.responseCode -eq "SUCCESS"){return $true}
         else{throw ($response | Select-Object *)}
     }
