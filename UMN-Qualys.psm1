@@ -691,7 +691,7 @@ function New-QualysHostAsset{
             Create New Qualys Asset
 
         .DESCRIPTION
-            Create New Qualys Host Asset 
+            Create New Qualys Host Asset
         .PARAMETER assetName
             Host Asset's FQDN to be added           
         .PARAMETER tagID
