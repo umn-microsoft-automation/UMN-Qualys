@@ -729,7 +729,7 @@ function New-QualysHostAsset{
         $body = $body | ConvertTo-Json -Depth 7
         $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/create/am/hostasset" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body
         if ($response.ServiceResponse.responseCode -eq "SUCCESS"){return $response.ServiceResponse.data.HostAsset}
-        else{throw ($response.ServiceResponse)}
+        else{return $($response.ServiceResponse.responseErrorDetails.errorMessage)}
     }
     End{}
 }
@@ -1092,7 +1092,7 @@ function Set-QualysHostAssetTag{
         $response = Invoke-RestMethod -Uri "https://$qualysServer/qps/rest/2.0/update/am/hostasset/$hostID" -Method Post -Headers @{'Content-Type' = 'application/json'} -WebSession $cookie -Body $body        
         ## the quayls api response is junk, to a get to test it actually got added
         if ($response.ServiceResponse.responseCode -eq 'SUCCESS'){return $true}
-        else{Write-Warning $response.ServiceResponse.responseErrorDetails;return $false}
+        else{return $($response.ServiceResponse.responseErrorDetails.errorMessage)}
     }
     End{}
 }
