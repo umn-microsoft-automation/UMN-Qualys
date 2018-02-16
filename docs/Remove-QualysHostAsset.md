@@ -5,19 +5,19 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-QualysBase
+# Remove-QualysHostAsset
 
 ## SYNOPSIS
-Not currently useable
+Remove Qualys Host Asset
 
 ## SYNTAX
 
 ```
-Invoke-QualysBase [-body] <Hashtable> [-method] <String> [-qualysServer] <String> [-cookie] <WebRequestSession>
+Remove-QualysHostAsset [-assetID] <String> [-qualysServer] <String> [-cookie] <WebRequestSession>
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+Remove New Qualys Host Asset
 
 ## EXAMPLES
 
@@ -30,23 +30,8 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -body
-{{Fill body Description}}
-
-```yaml
-Type: Hashtable
-Parameter Sets: (All)
-Aliases: 
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -method
-{{Fill method Description}}
+### -assetID
+Host Asset's ID
 
 ```yaml
 Type: String
@@ -54,7 +39,7 @@ Parameter Sets: (All)
 Aliases: 
 
 Required: True
-Position: 2
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -69,7 +54,7 @@ Parameter Sets: (All)
 Aliases: 
 
 Required: True
-Position: 3
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -84,7 +69,7 @@ Parameter Sets: (All)
 Aliases: 
 
 Required: True
-Position: 4
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

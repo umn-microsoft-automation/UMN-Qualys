@@ -14,18 +14,17 @@ Get Qualys Tag(s)
 
 ### ID
 ```
-Get-QualysTag -tagID <String> -qualysServer <String> -cookie <WebRequestSession> [<CommonParameters>]
+Get-QualysTag -tagID <String> -qualysServer <String> -cookie <WebRequestSession>
 ```
 
 ### Search
 ```
 Get-QualysTag -searchTerm <String> [-operator <String>] -qualysServer <String> -cookie <WebRequestSession>
- [<CommonParameters>]
 ```
 
 ### filter
 ```
-Get-QualysTag -filter <Hashtable> -qualysServer <String> -cookie <WebRequestSession> [<CommonParameters>]
+Get-QualysTag -filter <Hashtable> -qualysServer <String> -cookie <WebRequestSession>
 ```
 
 ## DESCRIPTION
@@ -133,9 +132,6 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
-
-### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

@@ -5,19 +5,20 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-QualysBase
+# New-QualysHostAsset
 
 ## SYNOPSIS
-Not currently useable
+Create New Qualys Asset
 
 ## SYNTAX
 
 ```
-Invoke-QualysBase [-body] <Hashtable> [-method] <String> [-qualysServer] <String> [-cookie] <WebRequestSession>
+New-QualysHostAsset [-assetName] <String> [-ip] <String> [[-tagID] <String>] [-qualysServer] <String>
+ [-cookie] <WebRequestSession>
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+Create New Qualys Host Asset
 
 ## EXAMPLES
 
@@ -30,11 +31,11 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -body
-{{Fill body Description}}
+### -assetName
+Host Asset's FQDN to be added
 
 ```yaml
-Type: Hashtable
+Type: String
 Parameter Sets: (All)
 Aliases: 
 
@@ -45,8 +46,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -method
-{{Fill method Description}}
+### -ip
+{{Fill ip Description}}
 
 ```yaml
 Type: String
@@ -55,6 +56,21 @@ Aliases:
 
 Required: True
 Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -tagID
+ID of tag to add at build time
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -69,7 +85,7 @@ Parameter Sets: (All)
 Aliases: 
 
 Required: True
-Position: 3
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -84,7 +100,7 @@ Parameter Sets: (All)
 Aliases: 
 
 Required: True
-Position: 4
+Position: 5
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
