@@ -2,6 +2,9 @@
 Powershell Wrapper for Qualys Rest API
 
 # Releases
+## 1.3.1 -- 2-23-18
+Add function update-qualysIP
+Add function Update-QualysAssetGroup
 
 ## 1.3.0 -- 2-16-18
 Add Code Signing
