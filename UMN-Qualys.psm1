@@ -23,6 +23,7 @@
 
 #endregion
 
+
 #region Connect-Qualys
 function Connect-Qualys{
     <#
@@ -1095,5 +1096,189 @@ function Set-QualysHostAssetTag{
         else{return $($response.ServiceResponse.responseErrorDetails.errorMessage)}
     }
     End{}
+}
+#endregion
+
+#region Update-QualysIP
+function Update-QualysIP{
+    <#
+        .Synopsis
+            Update IP asset in Qualys.
+
+        .DESCRIPTION
+            Update the FQDN, NetBIOS, and IP tracking info of the asset.
+
+        .PARAMETER cookie
+            Use Connect-Qualys to get session cookie
+
+        .PARAMETER fqdn
+            Domain validated and tested FQDN of host. something.ad.umn.edu
+
+        .PARAMETER ip
+            Valid IP address asset to be updated
+
+        .PARAMETER qualysServer
+            FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+        .EXAMPLE
+            Update-QualysIP -cookie $cookie -ip $ip -fqdn $fqdn -qualysServer $qualysServer
+
+        .NOTES
+            Authors: Kyle Weeks
+
+
+
+    #>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie,
+
+        [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
+        [string]$ip,
+
+        [Parameter(Mandatory)]
+        [string]$fqdn,
+
+        [Parameter(Mandatory)]
+        [string]$qualysServer
+    )
+
+    Begin{}
+    Process
+    {
+        $computer = $fqdn.Split('.')[0]
+        $body = "action=update&echo_request=1&ips=$ip&tracking_method=IP&host_dns=$fqdn&host_netbios=$computer"
+
+        [xml]$response = Invoke-RestMethod -Headers @{'X-Requested-With'="powershell"} -Uri "https://$qualysServer/api/2.0/fo/asset/ip/" -Method Post -WebSession $cookie -Body $body
+        ## check that it worked
+
+        if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq 'IP successfully updated')){$return = $response.SIMPLE_RETURN.RESPONSE.TEXT; throw "Failed to update IP $ip - $return"}
+        else{return $true}
+
+    }
+    End
+    {
+        $response = $null
+    }
+}
+#endregion
+
+#region Update-QualysAssetGroup
+function Update-QualysAssetGroup{
+    <#
+        .Synopsis
+            Update Asset Group
+
+        .DESCRIPTION
+            Add or remove specific IP address from Asset Group.
+
+        .PARAMETER action
+            Action to be performed. Add or delete.
+
+        .PARAMETER cookie
+            Use Connect-Qualys to get session cookie
+
+        .PARAMETER ip
+            IP address of entry to add/remove
+
+        .PARAMETER groupID
+            Asset group ID number to modify
+
+        .PARAMETER qualysServer
+            FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+
+    #>
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory)]
+        [ValidateSet('Add','Remove')]
+        [string]$action,
+
+        [Parameter(Mandatory)]
+        [Microsoft.PowerShell.Commands.WebRequestSession]$cookie,
+
+        [ValidatePattern("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")]
+        [string]$ip,
+
+        [Parameter(Mandatory)]
+        [int]$groupID,
+
+        [Parameter(Mandatory)]
+        [string]$qualysServer
+    )
+
+    Begin{}
+    Process
+    {
+        $actionBody = @{
+            action = "list"
+            ids = $groupID
+        }        
+        ## Run your action, WebSession contains the cookie from login
+        [xml]$returnedXML = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri "https://$qualysServer/api/2.0/fo/asset/group/" -Method Post -Body $actionBody -WebSession $cookie
+
+        # Single IPs
+        [System.Collections.ArrayList]$ips = $returnedXML.ASSET_GROUP_LIST_OUTPUT.RESPONSE.ASSET_GROUP_LIST.ASSET_GROUP.IP_SET.IP
+        # IP Ranges, these will take more work to extrapolate 
+        [System.Collections.ArrayList]$ipRanges = $returnedXML.ASSET_GROUP_LIST_OUTPUT.RESPONSE.ASSET_GROUP_LIST.ASSET_GROUP.IP_SET.IP_RANGE
+
+        ## break up the ip range strings, extract all the ips part of asset group.
+        foreach ($range in $ipRanges)
+        {
+            $a,$b = $range -split "-"
+            $a1,$a2,$a3,[int]$a4 = $a -split "\."
+            $b1,$b2,$b3,[int]$b4 = $b -split "\."
+            foreach ($i in $a4 .. $b4)
+            {
+                $newIP = $a1 + "." + $a2 + "." + $a3 + "." + [string]$i
+                # add to the array of IPs, check for doubles
+                if ($ips -notcontains $newIP){$null = $ips.Add($newIP)}
+            }
+    
+        }
+
+        ###  check if IP to be added is is in the list
+        If ($action -eq 'Remove')
+            {
+                if ($ips -contains $ip)
+                    {
+                        $actionBody = @{
+                            action = "edit"
+                            id = $groupID
+                            remove_ips = $ip
+                        }
+                        [xml]$response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri "https://$qualysServer/api/2.0/fo/asset/group/" -Method Post -Body $actionBody -WebSession $cookie
+                        ## check that it worked
+                        if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq 'Asset Group Updated Successfully')){$errorResponse = $response.SIMPLE_RETURN.RESPONSE.TEXT;throw "Failed to update Asset Group IP $ip - $errorResponse"}
+                        else{return "Asset Group Updated Successfully"}
+                    }
+                else{return "IP address $ip was not found in this asset group"} 
+            }
+        Else
+            {
+                if ($ips -notcontains $ip)
+                                    {
+                                        $actionBody = @{
+                                            action = "edit"
+                                            id = $groupID
+                                            add_ips = $ip
+                                        }
+                                        [xml]$response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri "https://$qualysServer/api/2.0/fo/asset/group/" -Method Post -Body $actionBody -WebSession $cookie
+                                        ## check that it worked
+                                        if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq 'Asset Group Updated Successfully')){$errorResponse = $response.SIMPLE_RETURN.RESPONSE.TEXT;throw "Failed to update Asset Group IP $ip - $errorResponse"}
+                                        else{return "Asset Group Updated Successfully"}
+                                    }
+                else{return "IP address $ip was already part of this asset group"} 
+
+            }
+    }
+    End
+    {
+        $returnedXML = $null
+    }
 }
 #endregion
