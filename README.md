@@ -2,6 +2,10 @@
 Powershell Wrapper for Qualys Rest API
 
 # Releases
+
+## 1.3.2
+Update-QualysAssetGroup function change to use URI over body hashtable in api call.
+
 ## 1.3.1 -- 2-23-18
 Add function update-qualysIP
 Add function Update-QualysAssetGroup
