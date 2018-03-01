@@ -1213,13 +1213,10 @@ function Update-QualysAssetGroup{
 
     Begin{}
     Process
-    {
-        $actionBody = @{
-            action = "list"
-            ids = $groupID
-        }        
+    {  
         ## Run your action, WebSession contains the cookie from login
-        [xml]$returnedXML = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri "https://$qualysServer/api/2.0/fo/asset/group/" -Method Post -Body $actionBody -WebSession $cookie
+        $uri = "https://$qualysServer/api/2.0/fo/asset/group/?action=list&ids=$groupID"
+        [xml]$returnedXML = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"} -Uri $uri -Method Post -WebSession $cookie
 
         # Single IPs
         [System.Collections.ArrayList]$ips = $returnedXML.ASSET_GROUP_LIST_OUTPUT.RESPONSE.ASSET_GROUP_LIST.ASSET_GROUP.IP_SET.IP
@@ -1246,12 +1243,9 @@ function Update-QualysAssetGroup{
             {
                 if ($ips -contains $ip)
                     {
-                        $actionBody = @{
-                            action = "edit"
-                            id = $groupID
-                            remove_ips = $ip
-                        }
-                        [xml]$response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri "https://$qualysServer/api/2.0/fo/asset/group/" -Method Post -Body $actionBody -WebSession $cookie
+                        $change = 'remove_ips'
+                        $uri = "https://$qualysServer/api/2.0/fo/asset/group/?action=edit&id=$groupID&$change=$ip"
+                        [xml]$response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri $uri -Method Post -WebSession $cookie
                         ## check that it worked
                         if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq 'Asset Group Updated Successfully')){$errorResponse = $response.SIMPLE_RETURN.RESPONSE.TEXT;throw "Failed to update Asset Group IP $ip - $errorResponse"}
                         else{return "Asset Group Updated Successfully"}
@@ -1262,12 +1256,9 @@ function Update-QualysAssetGroup{
             {
                 if ($ips -notcontains $ip)
                                     {
-                                        $actionBody = @{
-                                            action = "edit"
-                                            id = $groupID
-                                            add_ips = $ip
-                                        }
-                                        [xml]$response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri "https://$qualysServer/api/2.0/fo/asset/group/" -Method Post -Body $actionBody -WebSession $cookie
+                                        $change = 'add_ips'
+                                        $uri = "https://$qualysServer/api/2.0/fo/asset/group/?action=edit&id=$groupID&$change=$ip"
+                                        [xml]$response = Invoke-RestMethod -Headers @{"X-Requested-With"="powershell"}-Uri $uri -Method Post -WebSession $cookie
                                         ## check that it worked
                                         if (-not ($response.SIMPLE_RETURN.RESPONSE.TEXT -eq 'Asset Group Updated Successfully')){$errorResponse = $response.SIMPLE_RETURN.RESPONSE.TEXT;throw "Failed to update Asset Group IP $ip - $errorResponse"}
                                         else{return "Asset Group Updated Successfully"}
