@@ -23,7 +23,6 @@
 
 #endregion
 
-
 #region Connect-Qualys
 function Connect-Qualys{
     <#
