@@ -1,7 +1,12 @@
 # UMN-Qualys
+Final update from UMN team. We no long user Qualys, and are no longer maintaining this repo.
+
 Powershell Wrapper for Qualys Rest API
 
 # Releases
+
+## 1.3.3
+Kind document updates from University of Illinois
 
 ## 1.3.2
 Update-QualysAssetGroup function change to use URI over body hashtable in api call.
