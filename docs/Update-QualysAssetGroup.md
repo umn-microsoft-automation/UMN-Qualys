@@ -5,82 +5,35 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-QualysScanResults
+# Update-QualysAssetGroup
 
 ## SYNOPSIS
-Get results of Qualys Scan
+Update Asset Group
 
 ## SYNTAX
 
 ```
-Get-QualysScanResults [[-scanRef] <String>] [[-additionalOptions] <Hashtable>] [-brief]
- [-qualysServer] <String> [-cookie] <WebRequestSession> [<CommonParameters>]
+Update-QualysAssetGroup [-action] <String> [-cookie] <WebRequestSession> [[-ip] <String>] [-groupID] <Int32>
+ [-qualysServer] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Get reults of Qualys Scan
+Add or remove specific IP address from Asset Group.
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### Example 1
+```powershell
+PS C:\> {{ Add example code here }}
 ```
 
-```
-
-### EXAMPLE 2
-```
-
-```
+{{ Add example description here }}
 
 ## PARAMETERS
 
-### -scanRef
-Qualys Scan Reference, use Get-QualysScanList to find the reference
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -additionalOptions
-See documentation for full list of additional options and pass in as hashtable
-
-```yaml
-Type: Hashtable
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -brief
-{{ Fill brief Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -qualysServer
-FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+### -action
+Action to be performed.
+Add or delete.
 
 ```yaml
 Type: String
@@ -88,7 +41,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 3
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -103,7 +56,52 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ip
+IP address of entry to add/remove
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -groupID
+Asset group ID number to modify
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: True
 Position: 4
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -qualysServer
+FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 5
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

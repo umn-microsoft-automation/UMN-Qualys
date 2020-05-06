@@ -1,7 +1,7 @@
 ---
 external help file: UMN-Qualys-help.xml
 Module Name: UMN-Qualys
-online version: 
+online version:
 schema: 2.0.0
 ---
 
@@ -21,12 +21,12 @@ Connect to Qualys API and get back session $cookie for all other functions.
 
 ## EXAMPLES
 
-### -------------------------- EXAMPLE 1 --------------------------
+### EXAMPLE 1
 ```
 $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer
 ```
 
-### -------------------------- EXAMPLE 2 --------------------------
+### EXAMPLE 2
 ```
 $cookie = Connect-Qualys -qualysCred $qualysCred -qualysServer $qualysServer -assetTagging
 ```
@@ -39,7 +39,7 @@ use Get-Credential to create a PSCredential with the username and password of an
 ```yaml
 Type: PSCredential
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 1
@@ -54,7 +54,7 @@ FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform y
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 2
@@ -70,7 +70,7 @@ Use this switch to get a cookie to make calls to Asset Management and Tagging
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: False
 Position: Named
@@ -80,7 +80,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -90,4 +90,3 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 Author: Travis Sobeck, Kyle Weeks
 
 ## RELATED LINKS
-

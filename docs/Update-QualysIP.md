@@ -5,55 +5,50 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-QualysScanResults
+# Update-QualysIP
 
 ## SYNOPSIS
-Get results of Qualys Scan
+Update IP asset in Qualys.
 
 ## SYNTAX
 
 ```
-Get-QualysScanResults [[-scanRef] <String>] [[-additionalOptions] <Hashtable>] [-brief]
- [-qualysServer] <String> [-cookie] <WebRequestSession> [<CommonParameters>]
+Update-QualysIP [-cookie] <WebRequestSession> [[-ip] <String>] [-fqdn] <String> [-qualysServer] <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Get reults of Qualys Scan
+Update the FQDN, NetBIOS, and IP tracking info of the asset.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-
-```
-
-### EXAMPLE 2
-```
-
+Update-QualysIP -cookie $cookie -ip $ip -fqdn $fqdn -qualysServer $qualysServer
 ```
 
 ## PARAMETERS
 
-### -scanRef
-Qualys Scan Reference, use Get-QualysScanList to find the reference
+### -cookie
+Use Connect-Qualys to get session cookie
 
 ```yaml
-Type: String
+Type: WebRequestSession
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -additionalOptions
-See documentation for full list of additional options and pass in as hashtable
+### -ip
+Valid IP address asset to be updated
 
 ```yaml
-Type: Hashtable
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -64,23 +59,9 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -brief
-{{ Fill brief Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -qualysServer
-FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
+### -fqdn
+Domain validated and tested FQDN of host.
+something.ad.umn.edu
 
 ```yaml
 Type: String
@@ -94,11 +75,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -cookie
-Use Connect-Qualys to get session cookie
+### -qualysServer
+FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform you're in.
 
 ```yaml
-Type: WebRequestSession
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -117,5 +98,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ## NOTES
+Authors: Kyle Weeks
 
 ## RELATED LINKS
