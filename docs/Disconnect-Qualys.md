@@ -1,7 +1,7 @@
 ---
 external help file: UMN-Qualys-help.xml
 Module Name: UMN-Qualys
-online version: 
+online version:
 schema: 2.0.0
 ---
 
@@ -21,7 +21,7 @@ Disconnect Qaulys API Session, this only works on the old API
 
 ## EXAMPLES
 
-### -------------------------- EXAMPLE 1 --------------------------
+### EXAMPLE 1
 ```
 disconnect-Qualys -uri 'https://qualysapi.qualys.com:443/api/2.0/fo/session/' -header (Get-QualysHeader)
 ```
@@ -34,7 +34,7 @@ FQDN of qualys server, see Qualys documentation, based on wich Qualys Platform y
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 1
@@ -49,7 +49,7 @@ Use Connect-Qualys to get session cookie
 ```yaml
 Type: WebRequestSession
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 2
@@ -59,7 +59,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -69,4 +69,3 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 Author: Travis Sobeck
 
 ## RELATED LINKS
-
